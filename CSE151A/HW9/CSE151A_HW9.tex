@@ -1,0 +1,228 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+
+\begin{document}
+
+\pstitle{%
+    CSE 151A%
+}{
+    Homework 9%
+}[due Thursday, June 5 at 11:59PM]
+
+\textbf{Instructions:}
+\begin{itemize}
+    \item You may discuss problems with your study group, but ultimately all your work (mathematical problems, code, experimental details) must be individual.
+    \item Your solutions must be \texttt{typed up} and uploaded to Gradescope by 11:59PM on Thursday, June 5. No late homeworks will be accepted under any circumstances, so you are encouraged to upload early.
+    \item A subset of the problems will be graded.
+\end{itemize}
+
+\vspace{1em}
+{\header{Conceptual and mathematical problems}}
+
+\begin{probset}
+\begin{prob}[\textit{Neural net parametrization}]
+    A feedforward neural net has an input layer with 10 nodes, followed by four hidden layers with 1000 nodes each, and an output layer with one node. Each layer is fully connected to the previous layer. What is the total number of parameters, approximately? You may disregard the offset term at each node (the ``b'' in the linear function) if you like.
+
+    \begin{soln}
+        There are $10 * 1000 + 3 * 1000 * 1000 + 1000 = 3011000$ parameters.
+    \end{soln}
+\end{prob}
+
+\begin{prob}[\textit{Softmax probabilities}]
+    The output layer of a particular neural net has four nodes $y_1, y_2, y_3, y_4$, representing four labels in a classification problem. For some input $x$, these nodes end up with the values
+    \[
+        y_1 = 1.0, y_2 = 0.0, y_3 = -1.0, y_4 = 0.0
+    \]
+    and these are converted into probabilities using a softmax. What is the most likely label, and what probability is assigned to it?
+
+    \begin{soln}
+        The most likely label is 1, and the probability is $e^1 / (e^1 + e^0 + e^{-1} + e^0) = 0.5344$, or 53.44\%.
+    \end{soln}
+\end{prob}
+
+\begin{prob}[\textit{Exclusive-OR}]
+    The XOR Boolean function, $\{0, 1\}^2 \rightarrow \{0, 1\}$, has the following behavior:
+    \[
+        \begin{array}{c|c|c}
+            x_1 & x_2 & \text{XOR}(x_1, x_2) \\
+            \hline
+            0 & 0 & 0 \\
+            0 & 1 & 1 \\
+            1 & 0 & 1 \\
+            1 & 1 & 0
+        \end{array}
+    \]
+    Show how to implement this function using a neural net with two input units ($x_1, x_2$), an output unit, and two hidden units with ReLU activation.
+
+    \begin{soln}
+        The neural net is $h_1 = \text{ReLU}(x_1 + x_2 - 1)$, $h_2 = \text{ReLU}(1 - x_1 - x_2)$, and $y = 1 - h_1 - h_2$.
+    \end{soln}
+\end{prob}
+
+\newpage
+
+\begin{prob}[\textit{Decipher the net}]
+    \begin{subprobset}
+    \begin{subprob}
+        Which function $\{0, 1\}^2 \rightarrow \{0, 1\}$ is realized by the following neural net with two input units $x_1, x_2$, two hidden units $h_1, h_2$, and one output unit $y$?
+        \begin{itemize}
+            \item $h_1 = \text{ReLU}(x_1 + x_2)$
+            \item $h_2 = \text{ReLU}(x_1 + x_2 - 1)$
+            \item $y = h_1 - h_2$
+        \end{itemize}
+
+        \begin{soln}
+            This is the OR function since if $x_1 = x_2 = 0$, then $y = \text{ReLU}(0) - \text{ReLU}(-1) = 0$ and otherwise, $y = (x_1 + x_2) - (x_1 + x_2 - 1) = 1$.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Which function $\R \rightarrow \R$ is realized by the following neural net with one input unit $x$, two hidden units $h_1, h_2$, and one output unit $y$?
+        \begin{itemize}
+            \item $h_1 = \text{ReLU}(x)$
+            \item $h_2 = \text{ReLU}(-x)$
+            \item $y = h_1 + h_2$
+        \end{itemize}
+
+        \begin{soln}
+            This is the absolute value function since $y = \max(x, -x) = |x|$.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+{\header{Programming problems}}
+
+Before undertaking these problems, install PyTorch on your computer and download the archive files \texttt{simple-nn.zip} and \texttt{hymenoptera.zip} from the course website.
+
+\begin{progprob}[\textit{Credit card fraud data}]
+    Download the data set at \url{https://www.kaggle.com/mlg-ulb/creditcardfraud}. This data set has details of 284,807 credit card transactions, some of which are fraudulent. Each transaction is represented by 28 features (scrambled using PCA as a primitive kind of anonymization), and has a corresponding label (1 is fraudulent and 0 is legitimate).
+
+    \begin{subprobset}
+    \begin{subprob}
+        How many of the transactions are fraudulent? Why might this be problematic when learning a classifier?
+
+        \begin{soln}
+            There are 492 fraudulent transactions, or 0.17\%. This is problematic because the data set is highly imbalanced, and the classifier will likely be biased towards the majority class.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Downsample the legitimate transactions to make the data set more balanced. For instance, you might try to make sure that each class (legitimate or fraudulent) makes up at least 25\% of the data set.
+
+        \begin{verbatim}
+            num_fraud = df[df['Class'] == 1].shape[0]
+            legit = df[df['Class'] == 0].sample(n=num_fraud)
+            fraud = df[df['Class'] == 1]
+            balanced = pd.concat([fraud, legit])
+        \end{verbatim}
+    \end{subprob}
+
+    \newpage
+
+    \begin{subprob}
+        Fit three kinds of classifier to the data:
+        \begin{itemize}
+            \item decision tree
+            \item boosted decision stumps
+            \item random forest
+        \end{itemize}
+
+        In each case, use cross-validation to estimate the confusion matrix. For doing the cross-validation, you might find it helpful to use \texttt{sklearn.model\_selection.cross\_val\_predict}. For computing the confusion matrix, you can use \texttt{sklearn.metrics.confusion\_matrix}. If you want a slick display of the confusion matrix, you might try \texttt{sklearn.metrics.ConfusionMatrixDisplay}.
+
+        \begin{soln}
+            \begin{center}
+                \includegraphics[width=0.3\textwidth]{Images/Decision_Tree.png}
+                \includegraphics[width=0.3\textwidth]{Images/Random_Forest.png}
+                \includegraphics[width=0.3\textwidth]{Images/AdaBoost.png}
+            \end{center}
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{progprob}
+
+\begin{progprob}[\textit{Neural net experiments}]
+    When you unzip \texttt{simple-nn.zip}, you will see a Jupyter notebook called \texttt{simple-nn.ipynb}. Look through it and run the cells in Sections 1 and 2. These load in a data set called \texttt{data1.txt}, train a neural net on it, and print the decision boundary.
+
+    \begin{subprobset}
+    \begin{subprob}
+        Look at the training code. You will see that the neural net has \textbf{one} hidden layer with $H$ nodes. Train the net on the five data sets \texttt{data1.txt} through \texttt{data5.txt}. For each, try two values of $H$, and train multiple times (at least five), picking the lowest-error solution. For each of the data sets, plot the best model you found, state what value of $H$ produced it, and state the number of iterations till convergence.
+
+        \begin{soln}
+            \begin{center}
+                \includegraphics[width=0.3\textwidth]{Images/data1.png}
+                \includegraphics[width=0.3\textwidth]{Images/data2.png}
+                \includegraphics[width=0.3\textwidth]{Images/data3.png}
+                \includegraphics[width=0.3\textwidth]{Images/data4.png}
+                \includegraphics[width=0.3\textwidth]{Images/data5.png}
+            \end{center}
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Now move to Section 3 of the notebook. This generates a new data set that is highly noisy. To deal with it, copy over the neural net code from above and modify it to train a net with \textbf{two} hidden layers, each with $H$ nodes. Train the net a bunch of times and print the best boundary you find. You should aim for $< 100$ errors on the training set (this should be possible even with $H = 4$).
+
+        \begin{soln}
+            \begin{center}
+                \includegraphics[width=0.5\textwidth]{Images/6b.png}
+            \end{center}
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{progprob}
+
+\begin{progprob}[\textit{A computer vision classification task}]
+    In this problem, we'll train a classifier that takes as input an image of an ant or a bee, and determines which it is.
+
+    When you unzip \texttt{hymenoptera.zip} you will see a Jupyter notebook, called \texttt{ants-bees.ipynb} and a directory called \texttt{hymenoptera\_data}.
+
+    \begin{subprobset}
+    \begin{subprob}
+        The \texttt{hymenoptera\_data} directory has a subdirectory with the training set (\texttt{train}) and another with the test set (\texttt{val}). Take a look at some of the images. They are of varying sizes, with diverse backgrounds. And there are only 244 training images: not an easy learning problem!
+
+        Run the first few cells of the notebook to see how the images are normalized in size. Pick an image from the directory and show both the original version and the normalized version.
+
+        \begin{soln}
+            \begin{center}
+                \includegraphics[width=0.5\textwidth]{Hymenoptera/hymenoptera_data/train/ants/0013035.jpg}
+                \includegraphics[width=0.35\textwidth]{Images/7a.png}
+            \end{center}
+        \end{soln}
+    \end{subprob}
+
+    \newpage
+
+    \begin{subprob}
+        Run the remaining cells of the notebook to see how the ResNet50 network is used to produce a 2048-dimensional representation for each image, and how a logistic regression classifier is constructed on top of this. Report the test accuracy of the logistic regression classifier.
+
+        \begin{soln}
+            The test accuracy is 80.39\%.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Now, use this same 2048-d representation to construct a k-nearest neighbor classifier. Give the test accuracies obtained for $k = 1, 3, 5$. Note: If you use \texttt{sklearn.neighbors.KNeighborsClassifier}, you might want to set \texttt{algorithm='kd tree'}.
+
+        \begin{soln}
+            \begin{center}
+                \begin{tabular}{c|c}
+                    k & Test Accuracy \\
+                    \hline
+                    1 & 69.28\% \\
+                    3 & 71.24\% \\
+                    5 & 69.28\% \\
+                \end{tabular}
+            \end{center}
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{progprob}
+\end{probset}
+\end{document}
