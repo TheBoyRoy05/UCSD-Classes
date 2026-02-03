@@ -1,0 +1,3 @@
+bridge1:1
+fire_bridge:10
+water_bridge:100
