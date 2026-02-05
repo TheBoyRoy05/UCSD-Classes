@@ -1,0 +1,45 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Large data files
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+*.csv
+*.zip
+*.tar.gz
+*.gz
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.toc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear

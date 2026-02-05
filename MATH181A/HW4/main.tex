@@ -1,0 +1,227 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+\renewcommand{\P}{\mathbb{P}}
+
+\begin{document}
+
+\pstitle{%
+    MATH 181A%
+}{
+    Homework 4%
+}[due Saturday, January 31 at 11:59PM]
+
+\begin{probset}
+
+% --- Problem 1 ---
+\begin{prob}[\textbf{5.4.19}]
+    Let $Y_1, Y_2, \ldots, Y_n$ be a random sample of size $n$ from the pdf $f_Y(y; \theta) = \frac{1}{\theta} e^{-y/\theta}, y > 0$.
+
+    \begin{subprobset}
+    \begin{subprob}
+        Show that $\hat{\theta}_1 = Y_1, \hat{\theta}_2 = \bar Y$, and $\hat{\theta}_3 = n \cdot Y_{\min}$ are all unbiased estimators for $\theta$.
+
+        \begin{soln}
+            Since $Y_i \sim \text{Exponential}(\theta)$, we have $\E[\hat\theta_1] = \E[Y_1] = \E[Y_i] = \theta$. We also have $\E[\hat\theta_2] = \E[\bar Y] = \E\left[ \frac{1}{n} \sum_{i=1}^n Y_i \right] = \frac{1}{n} \sum_{i=1}^n \E[Y_i] = \frac{1}{n} \sum_{i=1}^n \theta = \theta$. Hence, $\hat{\theta}_1$ and $\hat{\theta}_2$ are unbiased estimators for $\theta$.
+
+            For $\hat{\theta}_3 = n \cdot Y_{\min}$, we have $\E[\hat{\theta}_3] = \E[n \cdot Y_{\min}] = n \cdot \E[Y_{\min}]$. We know that $Y_{\min}$ is the minimum of $n$ i.i.d. Exponential random variables with parameter $\theta$, so its distribution is:
+            \[
+                P(Y_{\min} \ge y) = \prod_{i=1}^n P(Y_i \ge y) = \prod_{i=1}^n e^{-y/\theta} = e^{-ny/\theta}, \quad F_{Y_{\min}}(y) = 1 - e^{-ny/\theta}
+            \]
+            \[
+                f_{Y_{\min}}(y) = \frac{d}{dy} F_{Y_{\min}}(y) = \frac{d}{dy} (1 - e^{-ny/\theta}) = \frac{n}{\theta} e^{-ny/\theta}
+            \]
+            Now we compute $\E[Y_{\min}]$ using IBP with $u = y$ and $dv = \frac{n}{\theta} e^{-ny/\theta} dy$ to find:
+            \[
+                \E[Y_{\min}] = \int_0^{\infty} y \frac{n}{\theta} e^{-ny/\theta} dy = \left[-y e^{-ny/\theta}\right]_0^{\infty} + \int_0^{\infty} e^{-ny/\theta} dy = \left[-\frac{\theta}{n} e^{-ny/\theta}\right]_0^{\infty} = \frac{\theta}{n}
+            \]
+            Thus, we have $\E[\hat{\theta}_3] = n \cdot \E[Y_{\min}] = n \cdot \frac{\theta}{n} = \theta$. Hence, $\hat{\theta}_3$ is an unbiased estimator for $\theta$.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Find the variances of $\hat{\theta}_1, \hat{\theta}_2, \text{ and } \hat{\theta}_3$.
+
+        \begin{soln}
+            Since $Y_i \sim \text{Exponential}(\theta)$ we know that $\V(Y_i) = \theta^2$. Thus, we have $\V(\hat\theta_1) = \V(Y_1) = \V(Y_i) = \theta^2$. Now, for $\hat\theta_2 = \bar Y$, we have:
+            \[
+                \V(\bar Y) = \V\left( \frac{1}{n} \sum_{i=1}^n Y_i \right) = \frac{1}{n^2} \V\left( \sum_{i=1}^n Y_i \right) = \frac{1}{n^2} \sum_{i=1}^n \V(Y_i) = \frac{1}{n^2} \sum_{i=1}^n \theta^2 = \frac{\theta^2}{n}
+            \]
+            Finally, for $\hat\theta_3 = n \cdot Y_{\min}$, we have:
+            \[
+                \E[Y_{\min}^2] = \int_0^{\infty} y^2 \cdot \frac{n}{\theta} e^{-ny/\theta} dy = \left[-y^2 e^{-ny/\theta}\right]_0^{\infty} + \int_0^{\infty} 2y e^{-ny/\theta} dy = 0 + 2\frac{\theta}{n}(\E[Y_{\min}]) = 2\frac{\theta^2}{n^2}
+            \]
+            Thus, we have $\V(\hat\theta_3) = n^2\V(Y_{\min}) = n^2(\E[Y_{\min}^2] - \E[Y_{\min}]^2) = n^2(2\frac{\theta^2}{n^2} - \frac{\theta^2}{n^2}) = \theta^2$.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Calculate the relative efficiencies of $\hat{\theta}_1$ to $\hat{\theta}_3$ and $\hat{\theta}_2$ to $\hat{\theta}_3$.
+
+        \begin{soln}
+            Using $\V(\hat\theta_1) = \theta^2$, $\V(\hat\theta_2) = \frac{\theta^2}{n}$, and $\V(\hat\theta_3) = \theta^2$, we have: $RE(\hat\theta_1, \hat\theta_3) = \frac{\theta^2}{\theta^2} = 1$ and $RE(\hat\theta_2, \hat\theta_3) = \frac{\theta^2}{\frac{\theta^2}{n}} = n$. Hence, $\hat\theta_1$ and $\hat\theta_3$ are equally efficient, and $\hat\theta_2$ is $n$ times more efficient than $\hat\theta_1$ and $\hat\theta_3$.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\newpage
+
+% --- Problem 2 ---
+\begin{prob}[\textbf{5.4.20}]
+    Given a random sample of size $n$ from a Poisson distribution, $\hat{\lambda}_1 = X_1$ and $\hat{\lambda}_2 = \bar X$ are two unbiased estimators for $\lambda$. First show that the two estimators in the problem are unbiased, then calculate the relative efficiency of $\hat{\lambda}_1$ to $\hat{\lambda}_2$.
+
+    \begin{soln}
+        Since $X_i \sim \text{Poisson}(\lambda)$ we know that $\E[X_i] = \V(X_i) = \lambda$. Thus, we have $\E[\hat\lambda_1] = \E[X_1] = \E[X_i] = \lambda$. Next, we have:
+        \[
+            \E[\hat\lambda_2] = \E[\bar X] = \E\left[ \frac{1}{n} \sum_{i=1}^n X_i \right] = \frac{1}{n} \sum_{i=1}^n \E[X_i] = \frac{1}{n} \sum_{i=1}^n \lambda = \lambda
+        \]
+        Hence, $\hat\lambda_1$ and $\hat\lambda_2$ are unbiased estimators for $\lambda$. Now, we know that $\V(\hat\lambda_1) = \V(X_1) = \lambda$, next:
+        \[
+            \V(\hat\lambda_2) = \V(\bar X) = \V\left( \frac{1}{n} \sum_{i=1}^n X_i \right) = \frac{1}{n^2} \V\left( \sum_{i=1}^n X_i \right) = \frac{1}{n^2} \sum_{i=1}^n \V(X_i) = \frac{1}{n^2} \sum_{i=1}^n \lambda = \frac{\lambda}{n}
+        \]
+        Thus, we have $RE(\hat\lambda_1, \hat\lambda_2) = \frac{\frac{\lambda}{n}}{\lambda} = \frac{1}{n}$. Hence, $\hat\lambda_2$ is $n$ times more efficient than $\hat\lambda_1$.
+    \end{soln}
+\end{prob}
+
+% --- Problem 3 ---
+\begin{prob}[\textbf{5.4.22}]
+    Suppose that $W_1$ is a random variable with mean $\mu$ and variance $\sigma^2_1$ and $W_2$ is a random variable with mean $\mu$ and variance $\sigma^2_2$. From Example 5.4.3, we know that $cW_1 + (1 - c)W_2$ is an unbiased estimator of $\mu$ for any constant $c > 0$. If $W_1$ and $W_2$ are independent, for what value of $c$ is the estimator $cW_1 + (1 - c)W_2$ most efficient?
+
+    \begin{soln}
+        \[
+            \V(cW_1 + (1 - c)W_2) = c^2\V(W_1) + (1 - c)^2\V(W_2) + 2c(1 - c)Cov(W_1, W_2) = c^2\sigma^2_1 + (1 - c)^2\sigma^2_2
+        \]
+        Thus to minimize this value, we find where $\frac{d}{dc} \V(cW_1 + (1 - c)W_2) = 0$.
+        \[
+            \frac{d}{dc} \V(cW_1 + (1 - c)W_2) = 2c\sigma^2_1 - 2(1 - c)\sigma^2_2 = 0 \implies c = \frac{\sigma^2_2}{\sigma^2_1 + \sigma^2_2}
+        \]
+        Thus, the value of $c$ that minimizes the variance of $cW_1 + (1 - c)W_2$ is $c = \frac{\sigma^2_2}{\sigma^2_1 + \sigma^2_2}$.
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 4 ---
+\begin{prob}
+    Suppose $X_1, \ldots, X_n$ are i.i.d. random variables with $E[X_i] = \theta$ and $\V(X_i) = \sigma^2$. Let $\hat{\theta}_1 = \bar{X}$. Suppose $\hat{\theta}_2$ is another estimator based on $X_1, \ldots, X_n$, which is known to be unbiased for $\theta$. Assume that $\V(\hat{\theta}_2) = \V(\hat{\theta}_1)/2$ and $Cov(\hat{\theta}_1, \hat{\theta}_2) = \V(\hat{\theta}_1)/3$. Consider the estimator $\hat{\theta} = c\hat{\theta}_1 + (1 - c)\hat{\theta}_2$, where $c \in [0, 1]$.
+
+    \begin{subprobset}
+    \begin{subprob}
+        Calculate the bias, variance, and mean squared error of $\hat{\theta}$. Hint: You shall use the fact $Cov(aX, bY ) = ab Cov(X, Y )$ for any random variables $X, Y$ and real numbers $a, b$.
+
+        \begin{soln}
+            Since $\hat\theta_1 = \bar X$ we know that $\E[\hat\theta_1] = \E[\bar X] = \E\left[ \frac{1}{n} \sum_{i=1}^n X_i \right] = \frac{1}{n} \sum_{i=1}^n \E[X_i] = \frac{1}{n} \sum_{i=1}^n \theta = \theta$. Thus, $\hat\theta_1$ is an unbiased estimator for $\theta$. Now, we have:
+            \[
+                \V(\hat\theta_1) = \V(\bar X) = \V\left( \frac{1}{n} \sum_{i=1}^n X_i \right) = \frac{1}{n^2} \V\left( \sum_{i=1}^n X_i \right) = \frac{1}{n^2} \sum_{i=1}^n \V(X_i) = \frac{1}{n^2} \sum_{i=1}^n \sigma^2 = \frac{\sigma^2}{n}
+            \]
+            Thus, we have $\V(\hat\theta_1) = \frac{\sigma^2}{n}$. Now, for $\hat\theta_2$, we have $\V(\hat\theta_2) = \V(\hat\theta_1)/2 = \frac{\sigma^2}{2n}$. Now, we find the bias of $\hat\theta$:
+            \[
+                \E[\hat\theta] = \E[c\hat\theta_1 + (1 - c)\hat\theta_2] = c\E[\hat\theta_1] + (1 - c)\E[\hat\theta_2] = c\theta + (1 - c)\theta = \theta
+            \]
+            Thus, we have $\E[\hat\theta] = \theta$ so the bias is 0 and $\hat\theta$ is unbiased. Now, we find the variance of $\hat\theta$:
+            \[
+                \V(\hat\theta) = \V(c\hat\theta_1 + (1 - c)\hat\theta_2) = c^2\V(\hat\theta_1) + (1 - c)^2\V(\hat\theta_2) + 2c(1 - c)Cov(\hat\theta_1, \hat\theta_2)
+            \]
+            \[
+                = c^2\frac{\sigma^2}{n} + (1 - c)^2\frac{\sigma^2}{2n} + 2c(1 - c)\frac{\sigma^2}{3n} = \frac{\sigma^2}{6n}(5c^2 - 2c + 3)
+            \]
+            Now, we find the mean squared error of $\hat\theta$ as 
+            \[
+                MSE(\hat\theta) = \V(\hat\theta) + \text{Bias}^2 = \V(\hat\theta) + 0^2 = \V(\hat\theta) = \frac{\sigma^2}{6n}(5c^2 - 2c + 3)
+            \]
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        For what value of $c$ is the mean squared error of $\hat{\theta}$ the smallest?
+
+        \begin{soln}
+            To find the value of $c$ that minimizes the mean squared error of $\hat\theta$, we find where $\frac{d}{dc} MSE(\hat\theta) = 0$.
+            \[
+                \frac{d}{dc} MSE(\hat\theta) = \frac{d}{dc} \left(\frac{\sigma^2}{6n}(5c^2 - 2c + 3)\right) = 0 \implies 10c - 2 = 0 \implies c = \frac{1}{5}
+            \]
+            Thus, the value of $c$ that minimizes the mean squared error of $\hat\theta$ is $c = \frac{1}{5}$.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\newpage
+
+% --- Problem 5 ---
+\begin{prob}[\textbf{5.5.1}]
+    Let $Y_1, Y_2, \ldots, Y_n$ be a random sample from the pdf $f_Y(y; \theta) = \frac{1}{\theta} e^{-y/\theta}, y > 0$. Compare the Cramer-Rao lower bound for $f_Y(y; \theta)$ to the variance of the maximum likelihood estimator for $\theta$, $\hat{\theta} = \frac{1}{n} \sum_{i=1}^n Y_i$. Is $\bar Y$ a best estimator for $\theta$?
+
+    \begin{soln}
+        Since $Y_i \sim \text{Exponential}(\theta)$ we know that $\E[Y_i] = \theta$ and $\V(Y_i) = \theta^2$. Thus, we have:
+        \[
+            \V(\hat\theta) = \V\left(\frac{1}{n} \sum_{i=1}^n Y_i\right) = \frac{1}{n^2} \V\left(\sum_{i=1}^n Y_i\right) = \frac{1}{n^2} \sum_{i=1}^n \V(Y_i) = \frac{1}{n^2} \sum_{i=1}^n \theta^2 = \frac{\theta^2}{n}
+        \]
+        Now, we find the Fisher information:
+        \[
+            I(\theta) = -\E\left[\frac{d^2}{d\theta^2} \log f_Y(y; \theta)\right] = -\E\left[\frac{d^2}{d\theta^2} \left( -\frac{y}{\theta} - \log \theta \right)\right] = -\E\left[-\frac{2y}{\theta^3} + \frac{1}{\theta^2}\right] = \frac{2}{\theta^2} - \frac{1}{\theta^2} = \frac{1}{\theta^2}
+        \]
+        Thus, we have $I(\theta) = \frac{1}{\theta^2}$. Now, we find the Cramer-Rao lower bound:
+        \[
+            CRLB = \frac{1}{nI(\theta)} = \frac{\theta^2}{n}
+        \]
+        Thus, we have $CRLB = \frac{\theta^2}{n}$. Since $\V(\hat\theta) = \frac{\theta^2}{n} = CRLB$, we have that $\hat\theta$ is a best estimator for $\theta$.
+    \end{soln}
+\end{prob}
+
+% --- Problem 6 ---
+\begin{prob}[\textbf{5.5.2}]
+    Let $X_1, X_2, \ldots, X_n$ be a random sample of size $n$ from the Poisson distribution, $p_X(k; \lambda) = e^{-\lambda} \lambda^k / k!$, $k = 0, 1, \ldots$. Show that $\hat{\lambda} = \frac{1}{n} \sum_{i=1}^n X_i$ is an efficient estimator for $\lambda$.
+
+    \begin{soln}
+        Since $X_i \sim \text{Poisson}(\lambda)$ we know that $\E[X_i] = \V(X_i) = \lambda$. Thus, we have:
+        \[
+            \V(\hat\lambda) = \V\left(\frac{1}{n} \sum_{i=1}^n X_i\right) = \frac{1}{n^2} \V\left(\sum_{i=1}^n X_i\right) = \frac{1}{n^2} \sum_{i=1}^n \V(X_i) = \frac{1}{n^2} \sum_{i=1}^n \lambda = \frac{\lambda}{n}
+        \]
+        Now, we find the Fisher information:
+        \[
+            I(\lambda) = -\E\left[\frac{d^2}{d\lambda^2} \log p_X(k; \lambda)\right] = -\E\left[\frac{d^2}{d\lambda^2} \left( -\lambda + k \log \lambda - \log k!\right)\right] = -\E\left[-\frac{k}{\lambda^2}\right] = \frac{1}{\lambda}
+        \]
+        Thus, we have $I(\lambda) = \frac{1}{\lambda}$. Now, we find the Cramer-Rao lower bound:
+        \[
+            CRLB = \frac{1}{nI(\lambda)} = \frac{\lambda}{n}
+        \]
+        Thus, we have $CRLB = \frac{\lambda}{n}$. Since $\V(\hat\lambda) = \frac{\lambda}{n} = CRLB$, we have that $\hat\lambda$ is an efficient estimator for $\lambda$.
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 7 ---
+\begin{prob}
+    Let $X_1, \ldots, X_n$ be a random sample from the density function $f_X(x; \theta) = (\theta + 1)x^\theta$ for $0 < x < 1$, and $f_X(x; \theta) = 0$ otherwise, where $\theta > -1$. Find the 100(1 - $\alpha$)\% confidence interval for $\theta$ based on the maximum likelihood estimator.
+
+    \begin{soln}
+        First we find the MLE of $\theta$:
+        \[
+            \ell(\theta) = \sum_{i=1}^n \log f_X(x_i; \theta) = \sum_{i=1}^n \log \left( (\theta + 1)x_i^\theta \right) = \sum_{i=1}^n \log(\theta + 1) + \theta \log x_i
+        \]
+        \[
+            \frac{d}{d\theta} \ell(\hat\theta) = \frac{n}{\hat\theta + 1} + \sum_{i=1}^n \log x_i = 0 \implies \hat\theta = -\frac{n}{\sum_{i=1}^n \log x_i} - 1
+        \]
+        Now, we find the Fisher information:
+        \[
+            I(\theta) = -\E\left[\frac{d^2}{d\theta^2} \log f_X(x; \theta)\right] = -\E\left[\frac{d^2}{d\theta^2} \left( \log(\theta + 1) + \theta \log x \right)\right] = -\E\left[-\frac{1}{(\theta + 1)^2}\right] = \frac{1}{(\theta + 1)^2}
+        \]
+        Now, the 100(1 - $\alpha$)\% confidence interval for $\hat\theta$ is given by:
+        \[
+            \hat\theta \pm z_{\alpha/2} \sqrt{\frac{1}{nI(\hat\theta)}} = \hat\theta \pm z_{\alpha/2} \frac{\hat\theta + 1}{\sqrt{n}}
+        \]
+    \end{soln}
+\end{prob}
+\end{probset}
+\end{document}

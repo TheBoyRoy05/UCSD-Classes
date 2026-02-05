@@ -1,0 +1,218 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+\renewcommand{\P}{\mathbb{P}}
+
+\begin{document}
+
+\pstitle{%
+    MATH 181A%
+}{
+    Homework 2%
+}[due Saturday, January 17 at 11:59PM]
+
+\begin{probset}
+
+% --- Problem 1 ---
+\begin{prob}
+    You need to do the MLE in 5.2.12 as well to make a comparison.
+
+    \begin{subprobset}
+        \begin{subprob}
+            \textbf{5.2.12} A random sample of size $n$ is taken from the pdf
+            \[
+                f_Y(y; \theta) = 2y/\theta^2, \quad 0 \leq y \leq \theta
+            \]
+            Find an expression for $\hat\theta$, the maximum likelihood estimator for $\theta$.
+
+            \begin{soln}
+                \begin{align*}
+                    L(\theta) &= \prod_{i=1}^n f_Y(y_i; \theta) = \prod_{i=1}^n \frac{2y_i}{\theta^2} \\
+                    \frac{d}{d\theta} L(\theta) &= \frac{d}{d\theta} \left( \frac{2^n}{\theta^{2n}} \prod_{i=1}^n y_i \right) = -\frac{2^{n+1}n}{\theta^{2n+1}} \prod_{i=1}^n y_i < 0 && \forall \theta \geq 0
+                \end{align*}
+
+                Since the likelihood function is strictly decreasing and we know that $\theta \geq y_i$ for all $i$, the maximum likelihood estimator is the smallest number $\geq y_i$ for all $i$. Thus, $\hat\theta = \max_{i=1}^n y_i$.
+            \end{soln}
+        \end{subprob}
+        
+        \begin{subprob}
+            \textbf{5.2.17}  Let $y_1, y_2, \ldots, y_n$ be a random sample of size $n$ from the pdf $f_Y(y; \theta) = 2y/\theta^2$, $0 \leq y \leq \theta$. Find a formula for the method of moments estimate for $\theta$. Compare the values of the method of moments estimate and the maximum likelihood estimate if a random sample of size 5 consists of the numbers 17, 92, 46, 39, and 56 (recall Question 5.2.12).
+
+            \begin{soln}
+                \begin{align*}
+                    \E[Y] &= \int_0^\theta y \frac{2y}{\theta^2} dy = \frac{2}{\theta^2} \int_0^\theta y^2 dy = \frac{2}{\theta^2} \left[ \frac{y^3}{3} \right]_0^\theta = \frac{2\theta^3}{3\theta^2} = \frac{2\theta}{3} \\
+                    \frac{2\theta}{3} = \bar{y} &\implies \theta = \frac{3}{2} \bar{y}
+                \end{align*}
+                Thus, $\theta_{e} = \frac{3}{2} \bar{y}$. Comparing this to the maximum likelihood estimator, we get $\hat\theta = \max_{i=1}^n y_i = 92$ and $\theta_{e} = \frac{3}{2} \cdot \frac{17 + 92 + 46 + 39 + 56}{5} = 75$ when the sample is (17, 92, 46, 39, 56). We can see here that the two estimates are different and generally won't give the same results.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\newpage
+
+% --- Problem 2 ---
+\begin{prob}[\textbf{5.2.18}]
+    Use the method of moments to estimate $\theta$ in the pdf $f_Y(y; \theta) = (\theta^2 + \theta)y^{\theta-1}(1 - y)$, $0 \leq y \leq 1$. Assume that a random sample of size $n$ has been collected.
+
+    \begin{soln}
+        \begin{align*}
+            \E[Y] &= \int_0^1 y (\theta^2 + \theta)y^{\theta-1}(1 - y) dy = \int_0^1 (\theta^2 + \theta)y^{\theta}(1 - y) dy \\
+            &= \int_0^1 (\theta^2 + \theta)y^{\theta} - (\theta^2 + \theta)y^{\theta+1} dy \\
+            &= (\theta^2 + \theta) \int_0^1 y^{\theta} dy - (\theta^2 + \theta) \int_0^1 y^{\theta+1} dy \\
+            &= (\theta^2 + \theta) \left[ \frac{y^{\theta+1}}{\theta+1} \right]_0^1 - (\theta^2 + \theta) \left[ \frac{y^{\theta+2}}{\theta+2} \right]_0^1 \\
+            &= (\theta^2 + \theta) \left( \frac{1}{\theta+1} \right) - (\theta^2 + \theta) \left( \frac{1}{\theta+2} \right) \\
+            &= \theta - \frac{\theta^2 + \theta}{\theta+2} = \frac{\theta}{\theta + 2} = \bar{y} \\
+            &\implies \theta_e = \frac{2\bar{y}}{1 - \bar{y}}
+        \end{align*}
+        Where $\bar{y} = \sum_{i=1}^n y_i / n$.
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 3 ---
+\begin{prob}[\textbf{5.2.21}]
+    Suppose that $Y_1 = 8.3, Y_2 = 4.9, Y_3 = 2.6, and Y_4 = 6.5$ is a random sample of size 4 from the two-parameter uniform pdf, 
+    \[
+        f_Y(y; \theta_1, \theta_2) = 1/(2\theta_2), \quad \theta_1 - \theta_2 \leq y \leq \theta_1 + \theta_2
+    \]
+    Use the method of moments to calculate $\theta_{1e}$ and $\theta_{2e}$.
+
+    \begin{soln}
+        \begin{align*}
+            \E[Y] &= \int_{\theta_1 - \theta_2}^{\theta_1 + \theta_2} y \frac{1}{2\theta_2} dy = \frac{1}{2\theta_2} \int_{\theta_1 - \theta_2}^{\theta_1 + \theta_2} y dy = \frac{1}{2\theta_2} \left[ \frac{y^2}{2} \right]_{\theta_1 - \theta_2}^{\theta_1 + \theta_2} \\
+            &= \frac{1}{2\theta_2} \left( \frac{\theta_1^2 + 2\theta_1\theta_2 + \theta_2^2}{2} - \frac{\theta_1^2 - 2\theta_1\theta_2 + \theta_2^2}{2} \right) \\
+            &= \frac{1}{2\theta_2} \left( \frac{4\theta_1\theta_2}{2} \right) = \theta_1 = \bar{y} \\
+            &\implies \theta_{1e} = \bar{y} \\
+            \E[Y^2] &= \int_{\theta_1 - \theta_2}^{\theta_1 + \theta_2} y^2 \frac{1}{2\theta_2} dy = \frac{1}{2\theta_2} \int_{\theta_1 - \theta_2}^{\theta_1 + \theta_2} y^2 dy = \frac{1}{2\theta_2} \left[ \frac{y^3}{3} \right]_{\theta_1 - \theta_2}^{\theta_1 + \theta_2} \\
+            &= \frac{1}{2\theta_2} \left( \frac{\theta_1^3 + 3\theta_1^2\theta_2 + 3\theta_1\theta_2^2 + \theta_2^3}{3} - \frac{\theta_1^3 - 3\theta_1^2\theta_2 + 3\theta_1\theta_2^2 - \theta_2^3}{3} \right) \\
+            &= \frac{1}{2\theta_2} \left( \frac{6\theta_1^2\theta_2 + 2\theta_2^3}{3} \right) = \theta_1^2 + \frac{\theta_2^2}{3} = \V(Y) + \E[Y]^2 \\
+            &\implies \V(Y) = \frac{\theta_{2e}^2}{3} &\implies \theta_{2e} = \sqrt{3s_y^2}
+        \end{align*}
+        Where $\bar{y} = \sum_{i=1}^n y_i / n$ and $s_y^2 = \sum_{i=1}^n (y_i - \bar{y})^2 / n$. Now we calculate $\theta_{1e}$ and $\theta_{2e}$ for the given sample:
+        \begin{align*}
+            \theta_{1e} &= \frac{8.3 + 4.9 + 2.6 + 6.5}{4} = 5.575 \\
+            \theta_{2e} &= \sqrt{3 \cdot \frac{(8.3 - 5.575)^2 + (4.9 - 5.575)^2 + (2.6 - 5.575)^2 + (6.5 - 5.575)^2}{4}} \approx 3.63
+        \end{align*}
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 4 ---
+\begin{prob}
+    You need to do the MLE in 5.2.13 as well to make a comparison. 
+    \begin{subprobset}
+        \begin{subprob}
+            \textbf{5.2.13} If the random variable $Y$ denotes an individual's income, Pareto's law claims that $\P(Y \geq y) = \left( \frac{k}{y} \right)^\theta$, where $k$ is the entire population's minimum income. It follows that $F_Y(y) = 1 - \left( \frac{k}{y} \right)^\theta$, and, by differentiation, 
+            \[
+                f_Y(y; \theta) = \theta k^\theta \left( \frac{1}{y} \right)^{\theta+1}, \quad y \geq k; \quad \theta \geq 1
+            \]
+            Assume $k$ is known. Find the maximum likelihood estimator for $\theta$ if income information has been collected on a random sample of 25 individuals.
+
+            \begin{soln}
+                \begin{align*}
+                    \ell(\theta) &= \sum_{i=1}^n \log f_Y(y_i; \theta) = \sum_{i=1}^n \log \left( \theta k^\theta \left( \frac{1}{y_i} \right)^{\theta+1} \right) = n\log \theta + n\theta\log k - (\theta+1)\sum_{i=1}^n \log y_i \\
+                    \frac{d}{d\theta} \ell(\theta) &= \frac{d}{d\theta} \left( n\log \theta + n\theta\log k - (\theta+1)\sum_{i=1}^n \log y_i \right) = \frac{n}{\theta} + n\log k - \sum_{i=1}^n \log y_i = 0 \\
+                    &\implies \hat\theta = \frac{n}{\sum_{i=1}^n \log y_i - n\log k} \implies \hat\theta = \frac{25}{\sum_{i=1}^{25} \log y_i - 25\log k}
+                \end{align*}
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            \textbf{5.2.22} Find a formula for the method of moments estimate for the parameter $\theta$ in the Pareto pdf,
+            \[
+                f_Y(y; \theta) = \theta k^{\theta} \left( \frac{1}{y} \right)^{\theta+1}, \quad y \geq k; \quad \theta \geq 1
+            \]
+            Assume that $k$ is known and that the data consist of a random sample of size $n$. Compare your answer to the maximum likelihood estimator found in Question 5.2.13.
+
+            \begin{soln}
+                \begin{align*}
+                    \E[Y] &= \int_k^\infty y \theta k^\theta \left( \frac{1}{y} \right)^{\theta+1} dy = \theta k^\theta \int_k^\infty \left( \frac{1}{y} \right)^{\theta} dy = \theta k^\theta \left[ -\frac{1}{\theta - 1} \left( \frac{1}{y} \right)^{\theta - 1} \right]_k^\infty = \frac{\theta k}{\theta - 1} = \bar{y} \\
+                    &\implies \theta k = \bar{y} (\theta - 1) \implies \theta_e = \frac{\bar{y}}{\bar{y} - k}
+                \end{align*}
+                Where $\bar{y} = \sum_{i=1}^n y_i / n$. Comparing this with the MLE, the MoM estimate relies on $\bar{y}$ while the MLE relies on the sample logs. These are different and generally won't give the same results.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\newpage
+
+% --- Problem 5 ---
+\begin{prob}[\textbf{5.2.4}]
+    Suppose a random sample of size $n$ is drawn from the probability model
+    \[
+        p_X(k; \theta) = \frac{\theta^{2k} e^{-\theta^2}}{k!}, \quad k = 0, 1, 2, \ldots
+    \]
+    Find a formula for the maximum likelihood estimator, $\hat\theta$.
+
+    \begin{soln}
+        \begin{align*}
+            \ell(\theta) &= \sum_{i=1}^n \log p_X(k_i; \theta) = \sum_{i=1}^n \log \left( \frac{\theta^{2k_i} e^{-\theta^2}}{k_i!} \right) = \sum_{i=1}^n (2k_i \log \theta - \theta^2 - \log k_i!) \\
+            \frac{d}{d\theta} \ell(\theta) &= \frac{d}{d\theta} \left( \sum_{i=1}^n (2k_i \log \theta - \theta^2 - \log k_i!) \right) = \frac{2}{\theta} \sum_{i=1}^n k_i - 2\theta n = 0 \implies \hat\theta = \sqrt{\frac{1}{n}\sum_{i=1}^n k_i} = \sqrt{\bar{k}}
+        \end{align*}
+    \end{soln}
+\end{prob}
+
+% --- Problem 6 ---
+\begin{prob}[\textbf{5.2.6}]
+    Use the method of maximum likelihood to estimate $\theta$ in the pdf
+    \[
+        f_Y(y; \theta) = \frac{\theta}{2\sqrt{y}} e^{-\theta \sqrt{y}}, \quad y \geq 0
+    \]
+    Evaluate $\theta_e$ for the following random sample of size 4: $y_1 = 6.2, y_2 = 7.0, y_3 = 2.5, \text{ and } y_4 = 4.2$.
+
+    \begin{soln}
+        \begin{align*}
+            \ell(\theta) &= \sum_{i=1}^n \log \left( \frac{\theta}{2\sqrt{y_i}} e^{-\theta \sqrt{y_i}} \right) = n\log \theta - \log 2 - \frac{1}{2} \sum_{i=1}^n \log y_i - \theta \sum_{i=1}^n \sqrt{y_i} \\
+            \frac{d}{d\theta} \ell(\theta) &= \frac{d}{d\theta} \left( n\log \theta - \log 2 - \frac{1}{2} \sum_{i=1}^n \log y_i - \theta \sum_{i=1}^n \sqrt{y_i} \right) = \frac{n}{\theta} - \sum_{i=1}^n \sqrt{y_i} = 0 \implies \hat\theta = \frac{n}{\sum_{i=1}^n \sqrt{y_i}} \\
+            &\implies \theta_e = \frac{4}{\sqrt{6.2} + \sqrt{7.0} + \sqrt{2.5} + \sqrt{4.2}} \approx 0.456
+        \end{align*}
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 7 ---
+\begin{prob}
+    Suppose $X_1, \ldots, X_n$ is a random sample from the uniform distribution on $[a, b]$.
+    \begin{subprobset}
+        \begin{subprob}
+            Find the method of moments estimators of $a$ and $b$.
+
+            \begin{soln}
+                \begin{align*}
+                    \E[X] &= \int_a^b x \frac{1}{b-a} dx = \frac{1}{b-a} \int_a^b x dx = \frac{1}{b-a} \left[ \frac{x^2}{2} \right]_a^b = \frac{b^2 - a^2}{2(b-a)} = \frac{a+b}{2} = \bar{X} \implies \hat{a} = 2\bar{X} - \hat{b} \\
+                    \E[X^2] &= \int_a^b x^2 \frac{1}{b-a} dx = \frac{1}{b-a} \int_a^b x^2 dx = \frac{1}{b-a} \left[ \frac{x^3}{3} \right]_a^b = \frac{b^3 - a^3}{3(b-a)} = \frac{a^2 + ab + b^2}{3} = \mu_2 \\
+                    &\implies \mu_2 = \frac{(2\bar{X} - \hat{b})^2 + (2\bar{X} - \hat{b})\hat{b} + \hat{b}^2}{3} = \frac{\hat{b}^2 - 2\bar{X}\hat{b} + 4\bar{X}^2}{3} = \frac{(\hat{b} - \bar{X})^2 + 3\bar{X}^2}{3} \\
+                    &\implies \hat{b} = \bar{X} + \sqrt{3(\mu_2 - \bar{X}^2)} \\
+                    &\implies \hat{a} = \bar{X} - \sqrt{3(\mu_2 - \bar{X}^2)}
+                \end{align*}
+                Where $\bar{X} = \sum_{i=1}^n X_i / n$.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Find the maximum likelihood estimators of $a$ and $b$.
+
+            \begin{soln}
+                \begin{align*}
+                    L(a, b) &= \prod_{i=1}^n f(X_i; a, b) = \begin{cases} \frac{1}{(b-a)^n} & \forall X_i \in [a, b] \\ 0 & \text{otherwise} \end{cases}
+                \end{align*}
+                To maximize this, you need to minimize $(b-a)$ such that all $X_i$ are in $[a, b]$. Thus, $a = \min_{i=1}^n X_i$ and $b = \max_{i=1}^n X_i$.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+\end{probset}
+\end{document}

@@ -1,0 +1,4 @@
+milo,frost,555,milo@pythonia.py,2
+ben,chen,376,ben@discussion.py,5
+bryce,hackel,398,bryce@gradescope.py,5
+dave,brave,1,dave@gmail.com,0

@@ -1,0 +1,3 @@
+Harrada
+Potion
+Paralyze,Silence

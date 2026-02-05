@@ -1,0 +1,424 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+
+\begin{document}
+
+\pstitle{%
+    DSC 140A%
+}{
+    Homework 3%
+}[due Wednesday, November 5 at 11:59PM]
+
+\begin{probset}
+\begin{prob}
+    \textit{\textcolor{blue}{\textbf{Motivation:} In Lectures 6 and 7, we saw how adding more features can backfire by reducing training error but increasing test error. In this problem, we will explore these effects on a simulated dataset where we know the data-generating distribution.}}
+
+    \begin{subprobset}
+        \begin{subprob}
+            Write a short code snippet in Python and numpy to generate a dataset $n = 1,000$ points. Each point in your dataset should consist of a feature vector with $d = 20$ features and an outcome generated as $y = Xw + \epsilon$. You can generate values of $X$ and $\epsilon$ from a random distribution so long as the parameters are clearly stated. You can specify any vector for $w \in \R^d$, so long as $w_j = 0$ for some $j = 1, \ldots, d$. Be sure to set the random seed so that you can generate the same values of $y$, $X$, and $\epsilon$ if you run your code more than once.
+
+            \begin{verbatim}
+def generate(n, d, seed):
+    np.random.seed(seed)
+    X = np.random.randn(n, d)
+    w = np.arange(d)
+    w[::5] = 0
+    epsilon = np.random.randn(n)
+    y = X @ w + epsilon
+    return X, y, w
+
+X, y, w_true = generate(1000, 20, 42)
+            \end{verbatim}
+        \end{subprob}
+
+        \begin{subprob}
+            Compute the expected test error of your model.
+
+            Generate a dataset of 400 points to evaluate different parameter selection strategies for Lasso models. Use a grid of $\lambda$ values defined as $\texttt{np.logspace(-3, 1, 50)}$. Using the dataset of 400 points, implement two parameter selection strategies:
+            \begin{itemize}
+                \item Train-Test Split: Randomly split your dataset into into a training set with 200 points, a validation set of 100 points, and a test set of 100 points. Use the training set to fit your model, the validation set to tune $\lambda$, and the test set to estimate out-of-sample error.
+                \item Use 5-fold cross-validation (5-CV) on the training set to select $\lambda$. Estimate out-of-sample error based on the 5-CV results.
+            \end{itemize}
+            Repeat each parameter selection procedure $m = 100$ times to obtain $m$ fitted models and $m$ corresponding out-of-sample error estimates (true error rates). For each fitted model, compute:
+            \begin{enumerate}[label=\roman*.]
+                \item Compute the true error rate of each model by computing the MSE on a large generated dataset (number of samples must be $\geq$ 10000). Compare these to the estimated error rates (validation or average CV errors) by computing the MSE between true errors and the estimated errors?
+                \item Compare the non-zero coefficients in each fitted model to the true coefficients to evaluate how often the Lasso correctly recovers the true underlying features.
+            \end{enumerate}
+
+            \begin{verbatim}
+n, d, m = 400, 20, 100
+lambda_values = np.logspace(-3, 1, 50)
+
+true_errors_split = []
+est_errors_split = []
+true_errors_cv = []
+est_errors_cv = []
+nonzero_recovery_split = []
+nonzero_recovery_cv = []
+
+n_large = 10000
+X_large, y_large, _ = generate(n_large, d, seed=0)
+
+for seed in tqdm(range(m)):
+    X, y, w_true = generate(n, d, seed)
+    perm = np.random.permutation(n)
+    X, y = X[perm], y[perm]
+    
+    # split
+    train_X, val_X, test_X = X[:200], X[200:300], X[300:]
+    train_y, val_y, test_y = y[:200], y[200:300], y[300:]
+    
+    # Train/Validation Split
+    val_mse = []
+    models = []
+    for lam in lambda_values:
+        model = Lasso(alpha=lam, max_iter=10000)
+        model.fit(train_X, train_y)
+        val_mse.append(mean_squared_error(val_y, model.predict(val_X)))
+        models.append(model)
+    
+    best_idx = np.argmin(val_mse)
+    best_model = models[best_idx]
+    
+    # True error on large dataset
+    true_mse_split = mean_squared_error(y_large, best_model.predict(X_large))
+    true_errors_split.append(true_mse_split)
+    est_errors_split.append(val_mse[best_idx])
+    nonzero_recovery_split.append(np.mean((best_model.coef_ != 0) == (w_true != 0)))
+    
+    # 5-Fold Cross-Validation
+    lasso_cv = LassoCV(alphas=lambda_values, cv=5, max_iter=10000)
+    lasso_cv.fit(train_X, train_y)
+    
+    # True error on large dataset
+    true_mse_cv = mean_squared_error(y_large, lasso_cv.predict(X_large))
+    true_errors_cv.append(true_mse_cv)
+    best_idx_cv = np.argmin(np.mean(lasso_cv.mse_path_, axis=1))
+    est_errors_cv.append(np.mean(lasso_cv.mse_path_[best_idx_cv]))
+    nonzero_recovery_cv.append(np.mean((lasso_cv.coef_ != 0) == (w_true != 0)))
+
+# Compare estimated vs. true errors
+mse_est_vs_true_split = mean_squared_error(true_errors_split, est_errors_split)
+mse_est_vs_true_cv = mean_squared_error(true_errors_cv, est_errors_cv)
+
+print("MSE between true and estimated errors (Split):", mse_est_vs_true_split)
+print("MSE between true and estimated errors (5-CV):", mse_est_vs_true_cv)
+print("Avg correct nonzero recovery (Split):", np.mean(nonzero_recovery_split))
+print("Avg correct nonzero recovery (5-CV):", np.mean(nonzero_recovery_cv))
+            \end{verbatim}
+
+            \begin{soln}
+                \begin{itemize}
+                    \item MSE between true and estimated errors (Split): 0.03715620277347157
+                    \item MSE between true and estimated errors (5-CV): 0.01706868560409366
+                    \item Avg correct nonzero recovery (Split): 0.8410000000000001
+                    \item Avg correct nonzero recovery (5-CV): 0.8385000000000001
+                \end{itemize}
+
+                It seems that the 5-CV method is more accurate than the split method with a smaller MSE between true and estimated errors (only about half the MSE). However, the split method has a slightly higher nonzero recovery rate indicating that it is more likely to recover the true underlying features.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            In the examples above, we did not use all the available data to fit out model. We left a test
+            set. Let us now include that data to fit the model.
+            \begin{enumerate}[label=\roman*.]
+                \item Compute the true error rate of each model using the data generating distribution. Compare these to the estimates by computing the MSE between true values and the estimates? Is it biased?
+                \item Compare the non-zero coefficients in each fitted model to the true coefficients to evaluate how often the Lasso correctly recovers the true underlying features.
+                \item Plot the coefficient estimates for each feature as you vary $\lambda$.
+            \end{enumerate}
+
+            \begin{soln}
+                \begin{itemize}
+                    \item MSE between true and estimated errors (Split): 0.05027778570872459
+                    \item MSE between true and estimated errors (5-CV): 0.03858883856964724
+                    \item Avg correct nonzero recovery (Split): 0.8410000000000001
+                    \item Avg correct nonzero recovery (5-CV): 0.8385000000000001
+                \end{itemize}
+
+                \begin{center}
+                    \includegraphics[width=0.8\textwidth]{images/1.3.png}
+                \end{center}
+
+                In both cases, the MSE between true and estimated errors is fairly low indicating that the models are not biased. The nonzero recovery rate is also fairly high indicating that the models are able to recover the true underlying features. Considering that $w$ consists of the numbers 0 through 19 with every 5th element being 0, we can see that the model is able to identify the true underlying features for most values of $\lambda$.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\begin{prob}
+    \textit{\textcolor{blue}{\textbf{Motivation:} In this problem, we will explore how logistic regression performs on an classification task where we can separate the data points. Our goal is to highlight the underlying mechanics of classification, and showcase differences between accuracy and performance measures we use for probabilistic classification.}}
+
+    Consider a binary classification task where we fit a linear model on $n$ data points $(x_1, y_1), \ldots, (x_n, y_n)$. Here, each $x_i \in \R^d$ is a feature vector and each $y_i \in \{-1, +1\}$ is a label. Our model has the form: $\hat{y} = \text{sign}(w^\top x)$ where $w \in \R^d$ is a vector of coefficients.
+
+    \begin{subprobset}
+        \begin{subprob}
+            Show that we can always fit a linear classifier with 0\% training error on a dataset with $d = n$ linearly independent features. In this case, the feature matrix $X$ is square with $n$ rows and $n$ linearly independent columns. The goal is to show that for any possible values of $y_1, \ldots, y_n$, we can find a vector $w$ so that $\hat{y}_i = y_i$ for all $i = 1, \ldots, n$.
+
+            \begin{soln}
+                If $X$ is square with $n$ rows and $n$ linearly independent columns, then $X$ is invertible. Therefore, we can solve for $w$ in the equation $Xw = y$ to get $w = X^{-1}y$ where $y \in \R^n$ since $y_i \in \{-1, +1\} \subset \R$. This works because $n = d$ and $X$ is invertible so you can always find a $w$ that satisfies the equation, and hence the linear classifier can always have 0\% training error.
+            \end{soln}
+        \end{subprob}
+
+        State if the following claims are TRUE, FALSE, or CANNOT TELL. Provide brief explanations.
+
+        \begin{subprob}
+            There are multiple linear classifiers of the form $\hat{y} = \text{sign}(w^\top x)$ that can assign perfect label predictions for the dataset in Part (1).
+
+            \begin{soln}
+                TRUE. You only need to find a $w$ such that $wX = \alpha y$ for some $\alpha \in \R$ since you only care about the sign of the prediction. This means that there are infinitely many solutions, and hence there are infinitely many linear classifiers that can assign perfect labels.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            The result in Part (1) still holds if we were to fit a linear classifier with an intercept - i.e., a model of the form $\hat{y} = \text{sign}(w^\top x + w_0)$.
+
+            \begin{soln}
+                TRUE. You could just set $w_0 = 0$ and $w = X^{-1}y$ to get a linear classifier that can assign perfect label predictions for the dataset.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            A vanilla logistic regression model fit on the dataset in (1) would have a training AUC of 1.0.
+
+            \begin{soln}
+                TRUE. Since the linear classifier can assign perfect label predictions for the dataset, the data is perfectly separable and the logistic regression model will have a training AUC of 1.0.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            A vanilla logistic regression model fit on the dataset in (1) would have a training ECE of 0.0\%.
+
+            \begin{soln}
+                CANNOT TELL. Even if the dataset is perfectly separable, logistic regression will push the predicted probabilities toward 0 or 1, but the exact probabilities depend on the optimization and regularization. The ECE may be close to 0, but it is not guaranteed.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            A vanilla logistic regression model fit on the dataset in (1) would assign reliable probability predictions to unseen data points.
+
+            \begin{soln}
+                FALSE. Even though logistic regression can perfectly separate the training data, this does not guarantee reliable probabilities on unseen points. We could have overfit.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\begin{prob}
+    \textit{\textcolor{blue}{\textbf{Motivation:} In this problem, we'll fit penalized logistic regression models for simple 2D synthetic datasets to explore its behavior in a setting where we know the ground-truth data-generating distribution. Our goal is to help you build intuition on what we can/cannot conclude from the kinds of estimates we use in practice. We've provided most of the code you need in a starter notebook available at \href{https://canvas.ucsd.edu/courses/68556/files/16299690?module_item_id=3000083}{\underline{this link}}.}}
+
+    \begin{subprobset}
+        \begin{subprob}
+            Implement L2-penalized logistic regression using \texttt{cvxpy} by adapting the \texttt{LogisticRegression} object in the starter notebook. You only need to implement fit method on Line 29 to formulate an optimization problem with \texttt{cvxpy}.
+
+            \begin{verbatim}
+def fit(self, X, y):
+    """
+    :return: coefficients of optimal model
+    """
+    assert self.check_data(X, y)
+    self.n = X.shape[0]
+    self.d = X.shape[1]
+    self.X = X
+    self.y = y
+    self.w = cp.Variable(self.d)
+    self.t = cp.Variable(1)
+    ## YOUR CODE STARTS HERE
+    J = cp.sum(cp.multiply(self.y, self.X @ self.w + self.t) - cp.logistic(self.X @ self.w + self.t))
+    self.problem = cp.Problem(cp.Maximize(J / self.n - self.C * cp.sum_squares(self.w)))
+    ## YOUR CODE ENDS HERE
+    self.problem.solve(solver=cp.ECOS)
+            \end{verbatim}
+        \end{subprob}
+
+        Generate a dataset of $n = 1000$ points by calling \texttt{X, y = generate\_data\_4b(n=1000)}.
+
+        \begin{subprob}
+            Plot the positive and negative points using the \texttt{plot\_data} function. Use your plot to describe if you expect this classification task to be easy or hard.
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.56\textwidth]{images/3.2.png}
+                \end{center}
+
+                This dataset is relatively easy to classify since the positive and negative points are well separated.
+            \end{soln}
+        \end{subprob}
+        
+        \begin{subprob}
+            Fit a "vanilla" logistic regression model without regularization by setting the penalty to a suitable value. Report the score function of your model and its logistic loss, AUC, and ECE on the training dataset.
+
+            \begin{soln}
+                The score function of the model is $\ell(w, w_0) = \sum_{i=1}^n \log(1 + \exp(-y_i(w^\top x_i + w_0)))$ where $w = [3.98825699, 3.40827279]$ and $w_0 = -35.23894751$. The logistic loss is 8.908908788551315e-06, the AUC is 1.0, and the ECE is 8.901337452000311e-06.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Plot a histogram of the probability predictions of the model from on the training dataset.
+            \begin{enumerate}[label=\roman*.]
+                \item Use your results to explain if the probability predictions are reliable.
+                \item Use your results to explain the behavior of logistic regression on this dataset. Why does \texttt{cvxpy} throw a warning in this case?
+            \end{enumerate}
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.55\textwidth]{images/3.4.png}
+                \end{center}
+
+                The probability predictions are not reliable since they are either 0 or 1. This is because the model is overfitting to the training data and will not generalize well to unseen data. The warning is thrown because the data is not regularized, and hence the model is overfitting.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Fit a penalized logistic regression model on the same dataset for an L2-penalty of $\lambda = 0.01$. How do your results from parts (c) and (d) change? Does \texttt{cvxpy} still throw a warning?
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.55\textwidth]{images/3.5.png}
+                \end{center}
+
+                The score function of the model is $\ell(w, w_0) = \sum_{i=1}^n \log(1 + \exp(-y_i(w^\top x_i + w_0)))$ where $w = [0.90541966, 0.93475659]$ and $w_0 = -9.14607445$. The logistic loss is 0.00868488516380167, the AUC is 1.0, and the ECE is 0.008520243340574449.
+
+                The model is still overfitting to the training data and will not generalize well to unseen data. However, the coefficients are smaller than the unregularized model while the logistic loss and ECE are slightly higher. The warning is not thrown because the data is regularized.
+            \end{soln}
+        \end{subprob}
+
+        Call \texttt{generate\_data\_4c(n=1000)} to generate a dataset of $n = 1000$ points from the distribution below:
+        
+        \begin{align*}
+            x1, x2 &\sim \text{Normal}([5, 5], I) \\
+            p &= \text{logistic}(10 - x_1 - x_2) \\
+            y &\sim \text{Bernoulli}(p)
+        \end{align*}
+
+        \begin{subprob}
+            Plot the positive and negative samples in your dataset. Do you expect this classification task to be easier or harder than the previous one?
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.56\textwidth]{images/3.6.png}
+                \end{center}
+
+                This dataset is harder to classify than the previous one since the positive and negative points are not as well separated.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Use your dataset to fit a vanilla logistic regression model and report its score function, loss, AUC, and ECE.
+
+            \begin{soln}
+                The score function of the model is $\ell(w, w_0) = \sum_{i=1}^n \log(1 + \exp(-y_i(w^\top x_i + w_0)))$ where $w = [-0.52707167, -0.51052774]$ and $w_0 = 5.30227402$. The logistic loss is 0.53521735638364, the AUC is 0.8060579873655236, and the ECE is 0.0184566705748682.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Explain how would expect the score function and summary statistics to change as when you fit a model using a very large number of samples on this dataset?
+
+            \begin{soln}
+                As the number of samples increases, the score function and summary statistics will converge to the true values. This is because the law of large numbers states that the sample mean will converge to the expected value as the number of samples increases.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Would you expect to improve prediction accuracy on this dataset by fitting a penalized logistic regression model and tuning the $\ell_2$ penalty? Why or why not?
+
+            \begin{soln}
+                I would not expect that much of an improvement in prediction accuracy by fitting a penalized logistic regression model and tuning the $\ell_2$ penalty. This is because the data has significant overlap between the positive and negative points and regularization helps to reduce overfitting by penalizing large coefficients which isn't relevant in this case.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Would you expect to improve prediction accuracy on this dataset by fitting a model with basis functions for $x_1$ and $x_2$? Why or why not?
+
+            \begin{soln}
+                No, becuase the data has significant overlap between the positive and negative points and basis functions won't help to separate the points. Basis functions help if the decision boundary is not linear. The issue here isn't the decision boundary, but that the data is not separable.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\begin{prob}
+    \textit{\textcolor{blue}{\textbf{Motivation:} In this problem, we will fit logistic regression models on the \href{https://archive.ics.uci.edu/ml/datasets/adult}{\underline{Adult dataset}}. This is a classical dataset in machine learning where want to predict if an individual in the 1994 US Census earns over \$50K annually. Our goal is to give you some practice with essential aspects of model development and evaluation when building a model that outputs risk predictions. We'll use a processed dataset with binary features to speed things up (\href{https://canvas.ucsd.edu/courses/68556/files/16299666?module_item_id=3000081}{\underline{link}}), and provide most of the code you need in a starter notebook (\href{https://canvas.ucsd.edu/courses/68556/files/16299689?module_item_id=3000082}{\underline{link}}).}}
+
+    \begin{subprobset}
+        \begin{subprob}
+            Fit a vanilla logistic regression model for this dataset.
+            \begin{enumerate}[label=\roman*.]
+                \item Plot an ROC curve and the reliability diagram for your model. Each plot should include 6 lines: (a) 1 line to show the performance of the model on the entire training dataset; (b) 5 lines to show the performance across the five folds.
+                \item Report the values of the training loss, AUC, and ECE for your model. Compare them to the values mean 5-CV estimates of the loss, AUC, ECE? Given your results, state if we can use the model for ranking and risk estimation on unseen data.
+            \end{enumerate}
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.8\textwidth]{images/4.1.png}
+                \end{center}
+
+                \begin{center}
+                    \begin{tabular}{lccc}
+                        \hline
+                        & Logistic Loss & AUC & ECE \\
+                        \hline
+                        Full Training & 0.3630 & 0.8757 & 0.0102 \\
+                        Fold 1 & 0.3642 & 0.8744 & 0.0148 \\
+                        Fold 2 & 0.3661 & 0.8734 & 0.0125 \\
+                        Fold 3 & 0.3593 & 0.8778 & 0.0141 \\
+                        Fold 4 & 0.3592 & 0.8815 & 0.0144 \\
+                        Fold 5 & 0.3725 & 0.8676 & 0.0190 \\
+                        Mean (5-Fold CV) & 0.3642 & 0.8749 & 0.0150 \\
+                        \hline
+                    \end{tabular}
+                \end{center}
+
+                Considering that the training loss on the full training is close to the mean 5-CV loss, we can see that the model is not overfitting to the training data and is able to generalize well to unseen data. Both the training AUC and CV AUC are similar and close to 1, showing the model has good ranking ability for unseen data. The calibration error is slightly higher on CV folds than training, but still very low, suggesting reasonably reliable probability estimates.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Fit a $L_1$-penalized logistic regression model by adapting your implementation in Part (1). Fit models for $L_1$-penalties in the set $\lambda \in \{0.001, 0.002, 0.005, 0.01, 0.02, 0.05\}$. Instead of tuning the $L_1$-penalty to maximize predictive accuracy, let us tune it to induce sparsity by returning the best possible model with a model size of at most 5. Here, model size refers to number of non-zero coefficients in your model excluding the intercept term. \textit{\textcolor{blue}{Note: you may run into a numerical issue where \texttt{cvxpy} returns coefficients with tiny values rather than 0. To avoid miscalculating model size in this case, you should manually set any coefficient $| \hat{w}_j | < 10^{-6}$ to 0.}}
+            \begin{enumerate}[label=\roman*.]
+                \item Plot an ROC curve and the reliability diagram for your model. Again, each plot should include 6 lines: 1 line to show the performance of the model on the entire training dataset; and 5 lines to show the performance across the five folds.
+                \item How does $L_1$-regularization affect calibration? Explain why you observe this effect?
+                \item What is its training loss, AUC, and ECE? What is the 5-CV loss, AUC, and ECE? Can you rely on 5-CV to estimate the performance of your model on unseen data?
+            \end{enumerate}
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.8\textwidth]{images/4.2.png}
+                \end{center}
+
+                The $L_1$ regularization causes the model to be sparse, leading to a higher calibration error in this case. This might be because the model isn't learning all the non-zero weights. The log loss for both the training and CV is 0.4353, the AUC for the training and CV is 0.8346 and 0.8354 respectively, and the ECE for both the training and CV is 0.0639. Since the AUCs and ECEs are close to each other, we can assume that the model is performing well on both the training and CV data. Also, the AUC is fairly high and the ECE is fairly low, so we can assume that the model is performing well on both the training and CV data.
+            \end{soln}
+        \end{subprob}
+
+        \begin{subprob}
+            Let's see if we can improve the probability predictions from your "sparse" model by Platt Scaling. Fit a vanilla logistic regression model to post-process the probability predictions from your model in part (b) via Platt scaling.
+            \begin{enumerate}[label=\roman*.]
+                \item Plot a reliability diagram to show the probabilities of the model trained on the entire training dataset after Platt Scaling. How do the probability predictions compare to the values you obtained in Part (b)?
+                \item How does Platt Scaling affect ECE? What about AUC? Explain your observations.
+            \end{enumerate}
+
+            \begin{soln}
+                \begin{center}
+                    \includegraphics[width=0.8\textwidth]{images/4.3.png}
+                \end{center}
+                
+                The probability predictions have moved closer to the 45 degree line, indicating that the model is more reliable. The ECE and AUC have both improved, indicating that the model is more reliable. The AUC was unaffected by Platt Scaling and remained at 0.8346. The ECE was cut in half, from 0.0639 to 0.0343 which makes sense since Platt Scaling is a calibration technique that pushes the predicted probabilities closer to the observed probabilities and doesn't affect the probability orders, hence why ECE is affected but AUC is not.
+            \end{soln}
+        \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+\begin{prob}[\textbf{Complete the Google form at the following \href{https://forms.gle/viRZMoyRM9t66GDc8}{link}.}]
+    Responding to this form is \textbf{MANDATORY} as it is worth a few points. Please note that it's not the content that is graded but whether you filled the form or not.
+\end{prob}
+\end{probset}
+\end{document}
