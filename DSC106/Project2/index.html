@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Project 2 Report</title>
+    <style>
+      :root {
+        --color-neutral-95: hsl(220 10% 95%);
+        --color-neutral-90: hsl(220 10% 90%);
+        --color-neutral-80: hsl(220 10% 80%);
+        --color-neutral-70: hsl(220 10% 70%);
+        --color-neutral-60: hsl(220 10% 60%);
+        --color-neutral-50: hsl(220 10% 50%);
+        --color-neutral-40: hsl(220 10% 40%);
+        --color-neutral-30: hsl(220 10% 30%);
+        --color-neutral-20: hsl(220 10% 20%);
+        --color-neutral-10: hsl(220 10% 10%);
+      }
+
+      html {
+        font: 100%/1.5 system-ui;
+        counter-reset: figure;
+        background: var(--color-neutral-95);
+        max-width: min(75vw, 80em);
+        margin: 0 auto;
+      }
+
+      /* Headings */
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        line-height: 1.1;
+        font-weight: 600;
+        text-wrap: balance;
+      }
+
+      h1,
+      h2 {
+        border-bottom: 1px solid var(--color-neutral-80);
+        padding-bottom: 0.2em;
+      }
+
+      h1 {
+        margin-block: 1em 0.5rem;
+        font-size: clamp(2.5em, 150% + 2vh + 2vw, 10vmin);
+        font-weight: 800;
+
+        small {
+          display: block;
+          width: fit-content;
+          padding: 0.2em 0.5em;
+          margin-inline: auto;
+          color: white;
+          background: var(--color-neutral-40);
+          font-size: 40%;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+      }
+
+      h2 {
+        font-size: 180%;
+        color: var(--color-neutral-30);
+      }
+
+      h3 {
+        font-size: 130%;
+      }
+
+      /* Lists */
+
+      ul,
+      ol {
+        padding-inline-start: 2em;
+      }
+
+      li {
+        &::marker {
+          color: var(--color-neutral-40);
+        }
+
+        + li {
+          margin-top: 0.2em;
+        }
+      }
+
+      /* Sectioning elements */
+
+      header {
+        padding-block: 1em;
+        text-align: center;
+      }
+
+      main {
+        background: white;
+        color: var(--color-neutral-20);
+        border-radius: 1rem;
+        padding: 0.1rem 2rem;
+      }
+
+      /* Figures */
+
+      figure {
+        margin: 1em 0;
+        padding: 0.5rem;
+        margin-inline: -0.5em;
+        border: 1px solid var(--color-neutral-80);
+        box-shadow: 0 0.1em 0.2em var(--color-neutral-95);
+        text-align: center;
+        background: white;
+
+        > figcaption {
+          font: 500 75% var(--font-sans);
+          background: var(--color-neutral-95);
+          padding: 0.5rem;
+          margin: -0.5rem;
+          margin-top: 0.5rem;
+          counter-increment: figure;
+          text-align: left;
+
+          &::before {
+            content: "Figure " counter(figure) ": ";
+            font-weight: bold;
+            color: var(--color-neutral-40);
+          }
+
+          a:not(:hover, :focus, :active) {
+            color: inherit;
+            text-decoration: underline;
+            text-decoration-color: color-mix(in lab, currentColor, transparent 70%);
+          }
+        }
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>
+        <small>Assignment 4</small>
+        Persuasive or Deceptive Visualization?
+      </h1>
+
+      <p><strong>Issac Roy</strong> — <em>iroy@ucsd.edu</em></p>
+    </header>
+
+    <main>
+      <h2>Proposition: A majority of women lack access to abortion clinics</h2>
+
+      <section>
+        <h3>FOR the Proposition</h3>
+
+        <figure>
+          <img src="./Images/FinalFor.png" alt="Women Lack Access to Abortion Clinics" />
+          <figcaption>Many counties in America lack abortion clinics.</figcaption>
+        </figure>
+
+        <p>Design Decisions and Rationale:</p>
+
+        <ul>
+          <li>
+            <strong> Title Framing: </strong>
+            I give this a score of -1.5 since the data represents the percent of counties without
+            abortion clinics, not the percent of women. Some large-population counties with clinics
+            could serve many. I don't give it a -2 since they are correlated, if only slightly. The
+            alternative was being more honest, but I settled on this title because it was the most
+            deceptive.
+          </li>
+
+          <li>
+            <strong>Average Line & Annotation:</strong>
+            I give this a score of -1 because although there may be value in seeing the average
+            percent of counties without clinics over states, it doesn't really tell us about the
+            number of women with access to abortion. The alternative was not including an
+            annotation, but I think it helps convey that there is a lack of abortion clinics.
+          </li>
+
+          <li>
+            <strong>Color Coding:</strong> I give this a score of -0.5 since it's slightly deceptive
+            to use red to convey this message. I could have used the default color scheme, but now
+            the visualization takes a pro-abortion stance by indicating that it's bad that many
+            counties don't have abortion clinics.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>AGAINST the Proposition</h3>
+
+        <figure>
+          <img src="./Images/FinalAgainst.png" alt="Women Have Access to Abortion Clinics" />
+          <figcaption>The majority of women have access to abortion clinics.</figcaption>
+        </figure>
+
+        <p>Design Decisions and Rationale:</p>
+
+        <ul>
+          <li>
+            <strong>Population-Based Weighting:</strong> I give this a score of 2 since it's the
+            most honest part of the visualization, especially since I collected external state
+            population data to do the calculations, rather than using misleading percentages
+            provided by the dataset.
+          </li>
+          <li>
+            <strong>Color Coding (Green for Access, Crimson for No Access):</strong> I give this a
+            score of -0.5 since it is slightly deceptive by indicating that access to abortion is a
+            good thing which many people may not necessarily agree with. I could have gone with the
+            default color scheme, but now the visualization conveys the argument that having access
+            to abortion clinics is positive.
+          </li>
+          <li>
+            <strong>Binary Pie Chart:</strong> I give this a score of 1.5 since it's fairly honest
+            to represent binary percentages in a pie chart. The only reason I don't give it a score
+            of 2 is because a horizontal bar might better represent the ratios. However, I settled
+            on a pie chart because it's more visually appealing.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Final Reflection</h2>
+
+        <p>
+          One of the most challenging aspects of this assignment was coming up with opposing
+          narratives using essentially the same dataset. Once I had a clear direction, though, I was
+          surprised by how easy it was to make subtle yet persuasive design choices that shaped the
+          viewer's interpretation. Before this project, I thought of data and statistics as
+          objective, reliable tools for decision-making. Now, I realize how quickly they can become
+          instruments of persuasion, or even manipulation, based on how they're visualized.
+        </p>
+
+        <p>
+          I now define ethical analysis and visualization as the practice of presenting data in a
+          way that is truthful, responsible, and transparent. The goal should not be to mislead or
+          confuse the audience, but to help them understand what is actually being shown. This means
+          avoiding misleading titles, skewed color choices, or manipulative design elements that
+          could distort the message of the data.
+        </p>
+
+        <p>
+          While the boundary between “acceptable” persuasive design and “misleading” design isn't
+          always clear-cut, some choices are undeniably deceptive. For example, in my first, more
+          misleading visualization, I claimed that women lack access to abortion care, when the data
+          only measured counties without clinics. That may seem like a fair assumption at first
+          glance, but in reality, large counties with clinics may serve large populations of women,
+          making the claim inaccurate. This was a clear example of crossing the line into
+          misinformation. Other decisions, like color schemes, can fall into a gray area, depending
+          on context. The key difference lies in intent and clarity: Are you helping the viewer
+          understand the truth, or nudging them toward a conclusion that isn't fully supported by
+          the data?
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
