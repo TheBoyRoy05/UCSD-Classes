@@ -1,0 +1,23 @@
+function out = drawCells(n, m, cells)
+    % Define the size of each cell
+    cellWidth = 10;
+    cellHeight = 10;
+    window_size = 750;
+    
+    % Loop through rows and columns to draw cells
+    for i = 1:n
+        for j = 1:m
+            % Calculate the position of the current cell
+            x = (j - 1) * cellWidth;
+            y = (i - 1) * cellHeight;
+            
+            % Draw a rectangle for each cell
+            if cel
+            rectangle('Position', [x, y, cellWidth, cellHeight], 'EdgeColor', [0.7 0.7 0.7], 'LineWidth', 2);
+        end
+    end
+    
+    set(gca, 'XTick', []);
+    set(gca, 'YTick', []);
+    set(gcf, 'Position', [400, 50, window_size, window_size]);
+end

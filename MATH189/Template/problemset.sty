@@ -109,7 +109,7 @@
 % create a new lettered subproblem
 \newenvironment{subprob}{
     \stepcounter{subprobnum}
-    \item[\textbf{\alph{subprobnum}}]%
+    \item[\textbf{\theprobnum.\thesubprobnum}]%
 }{}
 
 \newenvironment{progprob}[1][]{
