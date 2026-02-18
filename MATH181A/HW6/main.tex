@@ -1,0 +1,177 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+\renewcommand{\P}{\mathbb{P}}
+
+\begin{document}
+
+\pstitle{%
+    MATH 181A%
+}{
+    Homework 6%
+}[due Thursday, February 19, 2026 at 11:59PM]
+
+\textbf{Note:} To perform a hypothesis test, both the method of finding the critical regions and the method of calculating the p-value are important. As practice for both approaches, please find the critical values and critical regions for Problems \textbf{6.3.1(a)}, \textbf{6.3.4}, and \textbf{6.2.1}, and calculate the p-value for Problems \textbf{6.3.1(b)}, \textbf{6.3.3}, \textbf{6.2.4} and \textbf{6.2.8}.
+
+\vspace{1em}
+
+\begin{probset}
+% --- Problem 1 ---
+\begin{prob}[\textbf{6.3.1}]
+    Commercial fishermen working certain parts of the Atlantic Ocean sometimes find their efforts hindered by
+    the presence of whales. Ideally, they would like to scare away the whales without frightening the fish. One of the strategies being experimented with is to transmit underwater the sounds of a killer whale. On the fifty-two occasions that technique has been tried, it worked twenty-four times (that is, the whales immediately left the area). Experience has shown, though, that 40\% of all whales sighted near fishing boats leave of their own accord, probably just to get away from the noise of the boat.
+
+    \begin{subprobset}
+    \begin{subprob}
+        Let $p = \P(\text{Whale leaves area after hearing sounds of killer whale})$. Test $H_0: p = 0.40$ versus $H_1: p > 0.40$ at the $\alpha = 0.05$ level of significance. Can it be argued on the basis of these data that transmitting underwater predator sounds is an effective technique for clearing fishing waters of unwanted whales?
+
+        \begin{soln}
+            The critical region is found from the 95th quantile of $Binomial(52, 0.4) = 27$. Hence, the critical value is 28 and the critical region is $X \geq 28$. Since $X = 24 < 28$, we fail to reject $H_0$.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        Calculate the P-value for these data. For what values of $\alpha$ would $H_0$ be rejected?
+
+        \begin{soln}
+            The p-value is given by $\P(X \geq 24) = 1 - \P(X \leq 23) = 1 - \sum_{k=0}^{23} \binom{52}{k} (0.4)^k (0.6)^{52-k} = 0.2213$. $H_0$ would be rejected for any $\alpha \geq 0.2213$.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+% --- Problem 2 ---
+\begin{prob}[\textbf{6.3.3}]
+    Defeated in his most recent attempt to win a congressional seat because of a sizeable gender gap, a politician has spent the last two years speaking out in favor of women's rights issues. A newly released poll claims to have contacted a random sample of one hundred twenty of the politician's current supporters and found that seventy-two were men. In the election that he lost, exit polls indicated that 65\% of those who voted for him were men. Using an $\alpha = 0.05$ level of significance, test the null hypothesis that the proportion of his male supporters has remained the same. Make the alternative hypothesis one-sided.
+
+    \begin{soln}
+        To have a one-sided $H_1$, we'll make the alternative hypothesis $H_1: p < 0.65$. The p-value is given by $\P(X \leq 72) = \sum_{k=0}^{72} \binom{120}{k} (0.65)^k (0.35)^{120-k} = 0.1464 > \alpha = 0.05$, so we fail to reject $H_0$.
+    \end{soln}
+\end{prob}
+
+% --- Problem 3 ---
+\begin{prob}[\textbf{6.3.4}]
+    Suppose $H_0: p = 0.45$ is to be tested against $H_1: p > 0.45$ at the $\alpha = 0.14$ level of significance, where $p = P(\text{ith trial ends in success})$. If the sample size is two hundred, what is the smallest number of successes that will cause $H_0$ to be rejected?
+
+    \begin{soln}
+        The critical region is found from the 86th quantile of $Binomial(200, 0.45) = 98$. Hence, the critical value is 99 and the critical region is $X \geq 99$.
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 4 ---
+\begin{prob}[\textbf{6.2.1}]
+    State the decision rule that would be used to test the following hypotheses. Evaluate the appropriate test statistic and state your conclusion.
+
+    \begin{subprobset}
+    \begin{subprob}
+        $H_0: \mu = 120$ versus $H_1: \mu < 120$; $\bar{y} = 114.2$, $n = 25$, $\sigma = 18$, $\alpha = 0.08$
+
+        \begin{soln}
+            The critical value is found from the 8th quantile of $Normal(120, 18/\sqrt{25}) = 114.94$. So the critical region is $X \leq 114.94$. Since $X = 114.2 < 114.94$, we reject $H_0$.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        $H_0: \mu = 42.9$ versus $H_1: \mu \neq 42.9$; $\bar{y} = 45.1$, $n = 16$, $\sigma = 3.2$, $\alpha = 0.01$
+
+        \begin{soln}
+            The critical values are found from the .5th and 99.5th quantile of $\newline Normal(42.9, 3.2/\sqrt{16}) = [40.84, 44.96]$. So the critical region is $X \leq 40.84$ or $X \geq 44.96$. Since $X = 45.1 > 44.96$, we reject $H_0$.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        $H_0: \mu = 14.2$ versus $H_1: \mu > 14.2$; $\bar{y} = 15.8$, $n = 9$, $\sigma = 4.1$, $\alpha = 0.13$
+
+        \begin{soln}
+            The critical value is found from the 87th quantile of $Normal(14.2, 4.1/\sqrt{9}) = 15.74$. So the critical region is $X \geq 15.74$. Since $X = 15.8 > 15.74$, we reject $H_0$.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+% --- Problem 5 ---
+\begin{prob}[\textbf{6.2.4}]
+    Company records show that drivers get an average of 32,500 miles on a set of Road Hugger All-Weather radial tires. Hoping to improve that figure, the company has added a new polymer to the rubber that should help protect the tires from deterioration caused by extreme temperatures. Fifteen drivers who tested the new tires have reported getting an average of 33,800 miles. Can the company claim that the polymer has produced a statistically significant increase in tire mileage? Test $H_0: \mu = 32,500$ against a one-sided alternative at the $\alpha = 0.05$ level. Assume that the standard deviation ($\sigma$) of the tire mileages has not been affected by the addition of the polymer and is still four thousand miles.
+
+    \begin{soln}
+        The p-value is given by $\P(X \geq 33800)$ where $X \sim Normal(32500, 4000/\sqrt{15})$. We find that $P(X \geq 33800) = 0.1041 > \alpha = 0.05$, so we fail to reject $H_0$.
+    \end{soln}
+\end{prob}
+
+\newpage
+
+% --- Problem 6 ---
+\begin{prob}[\textbf{6.2.8}]
+    Calculate the P-values for the hypothesis tests indicated in Question 6.2.1. Do they agree with your decisions on whether or not to reject $H_0$?
+
+    \begin{subprobset}
+    \begin{subprob}
+        $H_0: \mu = 120$ versus $H_1: \mu < 120$; $\bar{y} = 114.2$, $n = 25$, $\sigma = 18$, $\alpha = 0.08$
+
+        \begin{soln}
+            The p-value is given by $\P(X \leq 114.2)$ where $X \sim Normal(120, 18/\sqrt{25})$. We find that $P(X \leq 114.2) = 0.0536 < \alpha = 0.08$, so we reject $H_0$ which agrees with our previous decision.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        $H_0: \mu = 42.9$ versus $H_1: \mu \neq 42.9$; $\bar{y} = 45.1$, $n = 16$, $\sigma = 3.2$, $\alpha = 0.01$
+
+        \begin{soln}
+            The p-value is given by $2 \cdot \P(X \geq 45.1)$ where $X \sim Normal(42.9, 3.2/\sqrt{16})$. We find that $2 \cdot P(X \geq 45.1) = 0.006 < \alpha = 0.01$, so we reject $H_0$ which agrees with our previous decision.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        $H_0: \mu = 14.2$ versus $H_1: \mu > 14.2$; $\bar{y} = 15.8$, $n = 9$, $\sigma = 4.1$, $\alpha = 0.13$
+
+        \begin{soln}
+            The p-value is given by $\P(X \geq 15.8)$ where $X \sim Normal(14.2, 4.1/\sqrt{9})$. We find that $P(X \geq 15.8) = 0.1214 < \alpha = 0.13$, so we reject $H_0$ which agrees with our previous decision.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+
+% --- Problem 7 ---
+\begin{prob}
+    We are going to perform an exact binomial test for the population proportion. Let $H_0: p = 0.4$ and we get a sample of size 10. The test statistic is $X = X_1 + \cdots + X_{10}$. Below is the table of probability mass function for $Binomial(10, 0.4)$.
+
+    \begin{center}
+        \begin{tabular}{c|c|c|c|c|c|c|c|c|c|c|c}
+            \hline
+            $k$ & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \\
+            \hline
+            $P(X = k)$ & 0.006 & 0.040 & 0.121 & 0.215 & 0.251 & 0.201 & 0.111 & 0.042 & 0.011 & 0.002 & 0.000 \\
+            \hline
+        \end{tabular}
+    \end{center}
+
+    \begin{subprobset}
+    \begin{subprob}
+        If $H_1: p \neq 0.4$, what is the critical region for the test statistic $X$ so that the significance level $\alpha$ is closest to but does not exceed 0.1?
+
+        \begin{soln}
+            The critical region is $X < 2$ or $X > 7$ because $\sum_{k=0}^{1} \binom{10}{k} (0.4)^k (0.6)^{10-k} = 0.046 < \alpha/2 = 0.05$ and $\sum_{k=8}^{10} \binom{10}{k} (0.4)^k (0.6)^{10-k} = 0.013 < \alpha/2 = 0.05$. Going one more in either direction exceeds the significance level.
+        \end{soln}
+    \end{subprob}
+
+    \begin{subprob}
+        If $H_1: p > 0.4$, what is the critical region for the test statistic $X$ so that the significance level $\alpha$ is closest to but does not exceed 0.1?
+
+        \begin{soln}
+            The critical region is found from the 90th quantile of $Binomial(10, 0.4) = 6$. Hence, the critical region is $X > 6$. That is, $\sum_{k=7}^{10} \binom{10}{k} (0.4)^k (0.6)^{10-k} < \alpha = 0.1$. Going one more exceeds the significance level.
+        \end{soln}
+    \end{subprob}
+    \end{subprobset}
+\end{prob}
+\end{probset}
+\end{document}
