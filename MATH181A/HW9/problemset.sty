@@ -1,0 +1,126 @@
+% problemset.sty
+% --------------
+% author: Issac Roy
+% email: iroy@ucsd.edu
+%
+% This package provides commands and environments for creating problem sets and
+% exams, along with solutions which can be hidden or shown. It uses elements from 
+% the DSC template created by Justin Eldrige and modified by Issac Roy.
+
+\RequirePackage{environ}
+\RequirePackage{tikz}
+\RequirePackage{mdframed}
+\RequirePackage{xparse}
+\RequirePackage{parskip}
+\RequirePackage{amsmath,amssymb,amsfonts,amsthm}
+\RequirePackage{booktabs}
+\RequirePackage{pgfplots}
+\RequirePackage{url}
+\RequirePackage{graphbox,graphicx}
+\RequirePackage{mathtools}
+\RequirePackage{enumitem}
+\RequirePackage{hyperref}
+
+% Package settings
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{positioning}
+
+% If true, solutions will be shown. Otherwise they will be hidden.
+\newif\ifshowsoln
+
+% If true, problem set will include a problem 0. Otherwise it will start at problem 1.
+\newif\ifproblemzero
+
+% draw the problem set's title
+\NewDocumentCommand{\pstitle}{ m m o }{
+    \begin{center}
+        \begin{tikzpicture}
+            \node[align=center] (title) at (0,0) {
+                    {
+                        \fontsize{12pt}{12pt}\selectfont
+                        \textbf{#1 - #2}
+                    }
+                    \IfNoValueTF{#3}{
+                    }{
+                        \\#3
+                    }
+                };
+                \draw[line width=1] 
+                    ([yshift=3]title.north west) 
+                    -- 
+                    ([yshift=3]title.north east);
+            \draw[line width=1] 
+                    ([yshift=-2]title.south west) 
+                    -- 
+                    ([yshift=-2]title.south east);
+        \end{tikzpicture}
+    \end{center}
+    \vspace{2em}
+}
+
+% problem environments
+% ------------------------------------------------------------------------------
+
+\newcounter{probnum}
+\ifproblemzero
+    \setcounter{probnum}{-1} % include a problem 0
+\fi
+
+\newcounter{subprobnum}[probnum]
+
+% create a new problem set environment with proper spacing
+\newenvironment{probset}{
+    \begin{list}{}{
+        \leftmargin=0em
+        \labelwidth=3cm
+        \itemsep=0.5cm
+        \parindent=1cm
+    }
+}{
+    \end{list}
+}
+
+% create a new block of subproblems, indented to the right
+\newenvironment{subprobset}{
+    \begin{list}{}{
+        \leftmargin=1cm
+        \labelwidth=1cm
+        \itemsep=0.25cm
+    }
+}{
+    \end{list}
+}
+
+% create a new numbered problem
+% the optional argument is meant for point totals, descriptions, etc. If empty,
+% nothing will be printed next to the problem number.
+\newenvironment{prob}[1][]{
+    \stepcounter{probnum}
+    \item \textbf{Problem \theprobnum.} #1
+    
+}{}
+
+% create a new lettered subproblem
+\newenvironment{subprob}{
+    \stepcounter{subprobnum}
+    \item[\textbf{(\alph{subprobnum})}]%
+}{}
+
+\newenvironment{progprob}[1][]{
+    \stepcounter{probnum}
+    \item \textbf{Programming Problem \theprobnum.} #1
+
+}{}
+
+\NewEnviron{soln}{
+    \mdfsetup{skipabove=1em, skipbelow=1em}
+    \begin{mdframed}
+         \textbf{Solution:} \BODY
+    \end{mdframed}
+}
