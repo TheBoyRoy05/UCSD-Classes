@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\w}{\mathbf{w}}
+
+\begin{document}
+
+\pstitle{%
+    DSC 180A PA 4%
+}{
+    Issac Roy%
+}[due Sunday, October 25 at 11:59PM]
+
+\begin{probset}
+% --- Problem 1 ---
+\begin{prob}
+    Describe one thing you found interesting in the reading. Describe what it is in your own words and why you found it interesting.
+
+    \begin{soln}
+        One thing I found interesting is the outlier problem and the distinction between quantizing weights versus activations. What I took away is that the outliers actually live in the activations, not the weights. A few specific input channels blow up, and a weight column only matters more because the big activation feeding it multiplies whatever rounding error you made there. So the weights themselves are pretty uniform, and it's the activation size that tells you which ones are worth protecting.
+
+        My first thought on the outlier thing was to just use a log scale so the big values don't dominate, which isn't what any of the papers do but felt natural to me. I also thought about heavily quantizing the weights that are less used, but I couldn't come up with an easy way to decide which ones are actually "significant", my guess being something to do with activation sizes.
+    \end{soln}
+\end{prob}
+
+% --- Problem 2 ---
+\begin{prob}
+    Describe one thing that you found difficult to understand. Try to be specific about what you don't think you understand.
+
+    \begin{soln}
+        The thing I found hardest was actually identifying which weights are the "significant" ones. I get that it has something to do with activation size, and further reading supported that idea, but I still can't fully explain the detailed methods like AWQ and GPTQ.
+
+        GPTQ especially is still confusing. I know that the high level idea is to fix the error after rounding by letting the remaining weights absorb some of the error. I'm not sure why the Hessian is the right thing to use there, or why it sometimes rounds a weight to a farther grid point instead of the nearest one.
+    \end{soln}
+\end{prob}
+
+% --- Problem 3 ---
+\begin{prob}
+    In the reading, identify one choice that the author made in their investigation and your best guess at why they made that choice. For example, this may be a choice in sub-population to study, or a choice in parameter for a model.
+
+    \begin{soln}
+        The choice I found peculiar is that QuaRot uses rotation matrices rather than any full-rank matrix. The idea is to spread the outliers out so every channel looks uniform, and to keep it reversible, and an arbitrary full-rank matrix seems like it covers both of those. They also say a learned rotation beats a random one because it aligns the data better, so I was wondering why a learned arbitrary full-rank matrix wouldn't give you the same uniform variance plus even more freedom.
+
+        My first guess was efficiency: a rotation's inverse is just its transpose, so undoing it is basically free, whereas inverting an arbitrary matrix is expensive, and QuaRot specifically uses Hadamard rotations whose entries are only $\pm 1$ so they're cheap to apply. 
+
+        I think there's also a deeper reason I may be missing. An arbitrary full-rank matrix could reintroduce issues with magnitude if the eigenvalues aren't constrained, so the length-preservation seems to be what actually makes rotations safe. Though there could still be some other constraints on the full rank matrices to make the eigenvalues small enough or something, but I don't see an immediate benefit for this approach though.
+    \end{soln}
+\end{prob}
+\end{probset}
+\end{document}

@@ -1,0 +1,58 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\w}{\mathbf{w}}
+
+\begin{document}
+
+\pstitle{%
+    DSC 180A%
+}{
+    Participation 3%
+}[due Sunday, October 18 at 11:59PM]
+
+\begin{probset}
+% --- Problem 1 ---
+\begin{prob}
+    Describe one thing you found interesting in the reading. Describe what it is in your own words and why you found it interesting.
+
+    \begin{soln}
+        One thing that I found interesting is that the obstacle to low-bit quantization isn't the weights but rather the activations. Each paper handles this by moving the difficulty from activations to weights. I'm not sure I fully understand the exact mechanisms though. As I understood it, all of the papers that we were assigned also attempted to tackle the same problem in different ways, mostly by scaling channels in specific ways.
+
+        This was my first real look into quantization and I had heard about it before, but I plan on continuing to look into this space now.
+    \end{soln}
+\end{prob}
+
+% --- Problem 2 ---
+\begin{prob}
+    Describe one thing that you found difficult to understand. Try to be specific about what you don't think you understand.
+
+    \begin{soln}
+        The difficulty that I had with these readings was understanding the exact mechanism in which the problem was solved, in this case quantization. I understand the motivation and the problem, but I'm not sure why each specific solution works and wouldn't be able to explain it to someone with my current understanding. 
+        
+        For example, GPTQ compensates for the error it makes when it rounds a weight by nudging the weights it hasn't quantized yet, and it uses the Hessian to decide how. I follow that the Hessian is measuring sensitivity, but I can't really explain why using its inverse gives the right adjustment, or why it's okay to quantize the columns in a fixed order.
+    \end{soln}
+\end{prob}
+
+% --- Problem 3 ---
+\begin{prob}
+    In the reading, identify one choice that the author made in their investigation and your best guess at why they made that choice. For example, this may be a choice in sub-population to study, or a choice in parameter for a model.
+
+    \begin{soln}
+        A choice that stood out to me was SpinQuant's decision to make the rotation matrices learnable instead of just fixing them like QuaRot does. QuaRot already showed that a fixed rotation smooths out the outliers and gets you down to 4-bit, so SpinQuant could have stopped there, but they instead trained the rotation on a small calibration set to minimize the quantized model's loss.
+
+        My guess at why they made this choice is that they noticed not every rotation works equally well, so leaving it fixed is leaving accuracy on the table. Since a rotation is reversible no matter what values it ends up with, they can learn a better one without any extra cost at inference time. 
+    \end{soln}
+\end{prob}
+\end{probset}
+\end{document}

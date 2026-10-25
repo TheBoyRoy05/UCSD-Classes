@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+% Custom commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\X}{\mathcal{X}}
+\newcommand{\Y}{\mathcal{Y}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\V}{\text{Var}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\x}{\mathbf{x}}
+\newcommand{\w}{\mathbf{w}}
+
+\begin{document}
+
+\pstitle{%
+    DSC 180A%
+}{
+    Participation 2%
+}[due Sunday, October 11 at 11:59PM]
+
+\begin{probset}
+% --- Problem 1 ---
+\begin{prob}
+    Describe one thing you found interesting in the reading. Describe what it is in your own words and why you found it interesting.
+
+    \begin{soln}
+        One thing I found interesting in the readings is how there was such low hanging fruit in terms of the bottleneck for inference. Since memory bandwidth is the main blocker, we can use more compute every time the weights are loaded in order to speed up token decoding / prediction.
+    \end{soln}
+\end{prob}
+
+% --- Problem 2 ---
+\begin{prob}
+    Describe one thing that you found difficult to understand. Try to be specific about what you don't think you understand.
+
+    \begin{soln}
+        One thing that I found difficult to understand is the DFlash architecture and how they came to the architecture that they did. I understand the need for parallel path selection and such, but I'm not sure what are the other things that separate this approach from MTP.
+    \end{soln}
+\end{prob}
+
+% --- Problem 3 ---
+\begin{prob}
+    In the reading, identify one choice that the author made in their investigation and your best guess at why they made that choice. For example, this may be a choice in sub-population to study, or a choice in parameter for a model.
+
+    \begin{soln}
+        As I understand it for DFlash, we have a smaller, separate draft model that makes the predictions which the target model tries to match. I'm guessing that one consideration that was given to this decision was to allow for more modularity at the user end since they would be able to switch out the drafter to perhaps gain acceptance rate / better look ahead depending on how much more memory they could utilize.
+    \end{soln}
+\end{prob}
+\end{probset}
+\end{document}
