@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{problemset}
+\showsolntrue
+
+\begin{document}
+
+\pstitle{%
+    DSC 180A PA 7%
+}{
+    Issac Roy%
+}[due Sunday, November 15 at 11:59PM]
+
+\noindent\textbf{Context.} Our project is about quantizing Pi0.5, a robot control model, so it runs faster, and we judge it by its success rate on LIBERO, a simulated benchmark where each attempt at a task is called an episode. These past two weeks we compared our measured runtimes against each stage's floor, the fastest it could possibly run given the math it does and the memory it reads, and ran our first baseline evaluation on a shared GPU cluster.
+
+\begin{probset}
+% --- Problem 1 ---
+\begin{prob}
+    Describe one result you found interesting doing your task. Describe what it is in your own words and why you found it interesting.
+
+    \begin{soln}
+        What I found most interesting is that the denoising loop, which is the slowest part of the model, runs about 16 times slower than its floor when uncompiled. My first thought was that this makes it the best place to quantize, but quantizing only shrinks the weights the GPU has to read, and memory reads aren't what's holding it back. Our measurements point to launch overhead instead, which is the CPU telling the GPU to start each of the many tiny operations one at a time, and the GPU sitting idle while it waits.
+
+        This was interesting because it changed how I think about where to optimize. A big gap from the floor doesn't mean quantization will help; it depends on what's causing the gap. Here the fix is to cut the overhead with compilation, and quantization only pays off once a stage is actually close to its floor.
+    \end{soln}
+\end{prob}
+
+% --- Problem 2 ---
+\begin{prob}
+    Describe one thing your struggled with doing your task. Try to be specific about what is causing you difficulty and why.
+
+    \begin{soln}
+        The thing I struggled with most was just getting a GPU. Our evaluation jobs on NRP sat in the queue for over two hours, because every card that could fit the model was already taken. I tried DSMLP as a backup, but even when I asked for an A30, every container landed on a GTX 1080 Ti, which doesn't have enough memory for our use case. When I dug into it, the cluster was quietly replacing my GPU request with a smaller GPU class after I submitted it, so no launch flag could get around it. I've currently filed an ITS ticket.
+    \end{soln}
+\end{prob}
+
+% --- Problem 3 ---
+\begin{prob}
+    In your work, identify one choice that you made in your investigation. Why did you make this choice? Were there other choices you could've made that would be reasonable? For example, this may be a choice in sub-population to study, or a choice in parameter for a model.
+
+    \begin{soln}
+        The choice I made was to run only 10 episodes per task for our baseline, so 100 episodes across the 10 tasks. I did this because GPU time has been really hard to get, and 10 episodes was enough to check that our setup works end to end.
+
+        The reasonable alternative is 50 episodes per task, which is what Physical Intelligence uses in their own LIBERO evaluation. The downside of 10 is that it's noisy. With only 100 episodes, I think we can't reliably tell a quantized model that's a few points worse apart from random chance, which is the comparison we care about. So once we have steady GPU access, I'd want to move to 50 for the final numbers.
+    \end{soln}
+\end{prob}
+\end{probset}
+\end{document}
